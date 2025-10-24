@@ -2,12 +2,12 @@ from Crypto.Cipher import DES, DES3, AES
 from Crypto.Util.Padding import pad, unpad
 from Crypto.Random import get_random_bytes
 
-def ajustar_llave(key, tamaño_necesario):
+def ajustar_llave(key, lenght):
     key_bytes = key.encode()
-    if len(key_bytes) < tamaño_necesario:
-        key_bytes += get_random_bytes(tamaño_necesario - len(key_bytes))
-    elif len(key_bytes) > tamaño_necesario:
-        key_bytes = key_bytes[:tamaño_necesario]
+    if len(key_bytes) < lenght:
+        key_bytes += get_random_bytes(lenght - len(key_bytes))
+    elif len(key_bytes) > lenght:
+        key_bytes = key_bytes[:lenght]
     return key_bytes
 
 
@@ -22,7 +22,7 @@ def cifrar(algoritmo, key, iv, texto):
         cipher = AES.new(key, AES.MODE_CBC, iv)
         block_size = AES.block_size
     else:
-        raise ValueError("Algoritmo no soportado")
+        raise ValueError("algoritmo no soportado")
 
     cifrado = cipher.encrypt(pad(texto.encode(), block_size))
     return cifrado
@@ -39,7 +39,7 @@ def descifrar(algoritmo, key, iv, texto_cifrado):
         cipher = AES.new(key, AES.MODE_CBC, iv)
         block_size = AES.block_size
     else:
-        raise ValueError("Algoritmo no soportado")
+        raise ValueError("algoritmo no soportado")
 
     descifrado = unpad(cipher.decrypt(texto_cifrado), block_size)
     return descifrado.decode()
@@ -47,7 +47,7 @@ def descifrar(algoritmo, key, iv, texto_cifrado):
 
 def ejecutar_algoritmo(algoritmo):
     print(f"\n--- {algoritmo} ---")
-    texto = input("Texto a cifrar: ")
+    texto = input("texto a cifrar: ")
 
     if algoritmo == "DES":
         key_len = 8
@@ -59,13 +59,13 @@ def ejecutar_algoritmo(algoritmo):
         key_len = 32
         iv_len = 16
 
-    key_input = input(f"Llave (se ajustará a {key_len} bytes): ")
+    key_input = input(f"Llave ({key_len} bytes): ")
     key = ajustar_llave(key_input, key_len)
     print(f"→ Llave final ({len(key)} bytes): {key}")
 
-    iv_input = input(f"Vector de inicialización (exactamente {iv_len} bytes): ").encode()
+    iv_input = input(f"Vector de inicialización ({iv_len} bytes): ").encode()
     if len(iv_input) != iv_len:
-        raise ValueError(f"El IV debe tener exactamente {iv_len} bytes.")
+        raise ValueError(f"El IV debe tener {iv_len} bytes.")
 
     texto_cifrado = cifrar(algoritmo, key, iv_input, texto)
     print(f"Texto cifrado (bytes): {texto_cifrado}")
@@ -91,4 +91,4 @@ if __name__ == "__main__":
     elif opcion == "3":
         ejecutar_algoritmo("3DES")
     else:
-        print("Opción no válida.")
+        print("opción no válida.")
